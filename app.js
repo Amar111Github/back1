@@ -2,14 +2,18 @@ var express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const http = require("http");
+const path  = require('path')
+
 const mongoose = require("mongoose");
 const { Server } = require("socket.io");
 const app = express();
 const server = http.createServer(app);
+const PORT = process.env.PORT || 4000;
+
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST","DELETE","PATCH","UPDATE"],
     credentials: true
   }
 });
@@ -18,9 +22,30 @@ require("dotenv").config();
 const connection = require("./dbConnection/dbconnect");
 connection();
 
-const PORT = process.env.PORT || 4000;
+// const _dirname = path.dirname("")
+// const buildPath = path.join(_dirname  , "../frontend/build");
 
-// acss the shows bdf file backend
+// app.use(express.static(buildPath))
+
+// app.get("/*", function(req, res){
+
+//     res.sendFile(
+//         path.join(__dirname, "../frontend/build/index.html"),
+//         function (err) {
+//           if (err) {
+//             res.status(500).send(err);
+//           }
+//         }
+//       );
+
+// })
+
+app.get("/", (req, res) => {
+  app.use(express.static(path.resolve(__dirname, "frontend", "build")));
+  res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
+  });
+
+// Access  the shows bdf file backend
 app.use("/files", express.static("files"));
 
 // custom  Routes import file
