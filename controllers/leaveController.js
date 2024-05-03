@@ -48,7 +48,7 @@ const getAllLeaveApplicationHr = async (req, res) => {
 // create a LeaveApplication
 const createLeaveApplication = async (req, res) => {
   console.log("body",req.body)
-  Joi.validate(req.body,(err, result) => {
+  // Joi.validate(req.body,(err, result) => {
    
     if (err) {
       console.log("hiiiiii",err);
@@ -94,7 +94,7 @@ console.log(newLeaveApplication)
         }
       });
     }
-  });
+
 };
 
 // find and update the LeaveApplication

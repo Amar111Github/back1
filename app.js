@@ -3,11 +3,19 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const http = require("http");
 const path  = require('path')
-
+require("dotenv").config();
 const mongoose = require("mongoose");
 const { Server } = require("socket.io");
 const app = express();
+// const connection = require("./dbConnection/dbconnect");
+// connection();
+mongoose.connect(process.env.DATABASEURL).then(() => {
+  console.log('Database is connected');
+}).catch(() => {
+  console.log('Database connection failed');
+});
 const server = http.createServer(app);
+
 const PORT = process.env.PORT || 4000;
 
 const io = new Server(server, {
@@ -17,10 +25,7 @@ const io = new Server(server, {
     credentials: true
   }
 });
-require("dotenv").config();
 
-const connection = require("./dbConnection/dbconnect");
-connection();
 
 const _dirname = path.dirname("")
 // const buildPath = path.join(_dirname  , "../frontend/build");
@@ -184,7 +189,6 @@ app.post("/api/tasks", upload.single("file"), async (req, res) => {
     adminMail: adminMail,
     employee: [{ type: mongoose.Schema.Types.ObjectId, ref: "Employee" }]
   });
-  console.log("newPdf ====", newPdf);
 
   // console.log(Taskname, path, description, department, managerEmail, comment, duration, status, startDate, endDate);
   try {
@@ -276,7 +280,6 @@ app.post("/api/tasks/:taskId/employees", async (req, res) => {
 });
 const users = {};
 io.on("connection", (socket) => {
-  console.log("server================", socket.id);
   //abhay:- here user is connecting and we are storing socket id and Mail
   socket.on("userConnected", (userData) => {
     users[socket.id] = { email: userData.email, socketId: socket.id };
@@ -380,7 +383,7 @@ io.on("connection", (socket) => {
           messageBy,
           profile
         } = data;
-        console.log(managerEmail);
+      
 
         employee.Notification.unshift({
           path,
@@ -407,8 +410,7 @@ io.on("connection", (socket) => {
           messageBy,
           profile
         } = data;
-        console.log(users);
-
+    
         employee.Notification.unshift({
           path,
           message,
@@ -435,7 +437,7 @@ io.on("connection", (socket) => {
         let targetUser = Object.values(users).find(
           (user) => user.email === val
         );
-        console.log(employee);
+      
         if (employee && targetUser) {
           const {
             senderMail,
@@ -595,7 +597,7 @@ io.on("connection", (socket) => {
       if (manager && targetManager) {
         const { message, status, path, taskId, messageBy, profile } = data;
 
-        console.log(data);
+        
 
         manager.Notification.unshift({
           message,
@@ -930,7 +932,7 @@ io.on("connection", (socket) => {
   socket.on("loginUser", async (data) => {
     try {
       const { manager, user } = data;
-      console.log("manager", manager, user);
+     
       let currentTime = new Date().toLocaleTimeString();
       let data1 = {
         message: `${user} login at ${currentTime}`
@@ -938,7 +940,7 @@ io.on("connection", (socket) => {
       let targetUser = Object.values(users).find(
         (user) => user.email === manager
       );
-      console.log("user", targetUser);
+     
       if (targetUser) {
         io.to(targetUser.socketId).emit("userLogin", data1);
       }
@@ -949,7 +951,7 @@ io.on("connection", (socket) => {
   socket.on("logoutUser", async (data) => {
     try {
       const { manager, user } = data;
-      console.log(manager, user);
+     
       let currentTime = new Date().toLocaleTimeString();
       let data1 = {
         message: `${user} logout at ${currentTime}`
@@ -957,7 +959,7 @@ io.on("connection", (socket) => {
       let targetUser = Object.values(users).find(
         (user) => user.email === manager
       );
-      console.log("user", targetUser);
+   
       if (targetUser) {
         io.to(targetUser.socketId).emit("userLogout", data1);
       }
@@ -974,6 +976,7 @@ io.on("connection", (socket) => {
 //     console.log("started");
 //   });
 // } else
+
 server.listen(PORT, () =>
   console.log(`Example app listening on port ${PORT}!`)
 );
