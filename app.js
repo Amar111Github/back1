@@ -22,7 +22,7 @@ require("dotenv").config();
 const connection = require("./dbConnection/dbconnect");
 connection();
 
-// const _dirname = path.dirname("")
+const _dirname = path.dirname("")
 // const buildPath = path.join(_dirname  , "../frontend/build");
 
 // app.use(express.static(buildPath))
@@ -40,10 +40,21 @@ connection();
 
 // })
 
-app.get("/", (req, res) => {
-  app.use(express.static(path.resolve(__dirname, "frontend", "build")));
-  res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
-  });
+app.use(express.json());
+const buildPath = path.join(__dirname, "../frontend/build");
+app.use(express.static(buildPath));
+app.use(cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  }));
+  
+
+
+
+// app.get("/", (req, res) => {
+//   app.use(express.static(path.resolve(__dirname, "frontend", "build")));
+//   res.sendFile(path.resolve(__dirname, "frontend", "build", "index.html"));
+//   });
 
 // Access  the shows bdf file backend
 app.use("/files", express.static("files"));
